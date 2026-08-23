@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Abdelnaser | Enterprise Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --dark-glass: rgba(10, 15, 30, 0.6);
+            --border-glass: rgba(0, 243, 255, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #05050a;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Interactive Mouse Cursor Glow */
+        #cursor-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 243, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            transition: 0.1s ease-out;
+        }
+
+        /* Animated Grid Background */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -2;
+            transform: perspective(500px) rotateX(60deg);
+            animation: gridMove 20s linear infinite;
+        }
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 40px; }
+        }
+
+        .container { max-width: 1500px; margin: 0 auto; padding: 40px 20px; }
+
+        /* Glassmorphism Core */
+        .glass-panel {
+            background: var(--dark-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 243, 255, 0.05);
+        }
+
+        /* Header */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 30px 40px; margin-bottom: 40px;
+        }
+        
+        .brand h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem; font-weight: 900;
+            background: linear-gradient(90deg, #fff, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+        @keyframes textGlow {
+            from { text-shadow: 0 0 10px rgba(0,243,255,0.2); }
+            to { text-shadow: 0 0 30px rgba(0,243,255,0.8), 0 0 50px rgba(188,19,254,0.6); }
+        }
+
+        .server-time { text-align: right; }
+        .server-time h3 { color: #8892b0; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .server-time p { color: var(--neon-blue); font-size: 1.5rem; font-weight: 700; font-family: 'Orbitron', sans-serif; }
+
+        /* Payday Counter */
+        .countdown-section {
+            text-align: center; padding: 25px; margin-bottom: 40px;
+            background: linear-gradient(90deg, rgba(255, 0, 85, 0.1), rgba(0, 243, 255, 0.1));
+            border: 1px solid rgba(255, 0, 85, 0.3);
+        }
+        .countdown-section h2 { color: #ff0055; letter-spacing: 2px; text-transform: uppercase; font-size: 1.5rem; }
+        .countdown-section .days { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px #ff0055; margin: 0 15px; }
+
+        /* Executive Board */
+        .exec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 50px; }
+        .exec-card {
+            padding: 40px; text-align: center; position: relative; overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .exec-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+        }
+        .exec-card:hover { transform: translateY(-15px) scale(1.02); box-shadow: 0 20px 50px rgba(0, 243, 255, 0.2); border-color: var(--neon-blue); }
+        
+        .exec-title { color: var(--neon-blue); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; }
+        .exec-name { font-family: 'Orbitron', sans-serif; font-size: 2rem; margin: 10px 0; }
+        .exec-revenue { font-size: 3.5rem; font-weight: 900; color: #fff; margin-top: 15px; font-family: 'Orbitron', sans-serif; }
+        .exec-revenue span { color: #00ff88; font-size: 1.5rem; }
+
+        /* Employee Grid (3D Template Feel) */
+        .section-title { font-size: 2rem; margin-bottom: 30px; color: #fff; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 15px; }
+        
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 35px; perspective: 1000px; }
+        
+        .emp-card {
+            padding: 30px; transform-style: preserve-3d; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative; z-index: 1; cursor: crosshair;
+        }
+        .emp-card:hover {
+            transform: rotateX(5deg) rotateY(-5deg) translateY(-10px);
+            border-color: var(--neon-purple);
+            box-shadow: -15px 15px 30px rgba(188, 19, 254, 0.15);
+        }
+
+        .emp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
+        .emp-info h3 { font-size: 1.8rem; font-weight: 700; letter-spacing: 1px; }
+        
+        /* Spinning Department Badge */
+        .dept-badge {
+            background: rgba(188, 19, 254, 0.1); border: 1px solid var(--neon-purple); color: var(--neon-purple);
+            padding: 5px 15px; border-radius: 30px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase;
+            display: inline-block; margin-top: 5px; transition: 0.5s;
+        }
+        .emp-card:hover .dept-badge { transform: rotateY(360deg); background: var(--neon-purple); color: #fff; }
+
+        .emp-id { font-family: 'Orbitron', sans-serif; color: #8892b0; letter-spacing: 2px; }
+
+        /* Dual Progress System */
+        .progress-container { display: flex; align-items: center; gap: 20px; margin: 25px 0; }
+        
+        /* Linear Progress */
+        .linear-track { flex-grow: 1; }
+        .linear-stats { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1rem; color: #a8b2d1; }
+        .bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; position: relative; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); border-radius: 10px; width: 0%; transition: 1.5s ease-out; box-shadow: 0 0 10px var(--neon-blue); }
+        
+        /* Circular Spinner Progress */
+        .circular-chart {
+            position: relative; width: 60px; height: 60px; border-radius: 50%;
+            background: conic-gradient(var(--neon-blue) 0%, rgba(255,255,255,0.05) 0%);
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 15px rgba(0,243,255,0.2);
+            transition: 1s ease-out;
+        }
+        .circular-chart::before { content: ''; position: absolute; width: 48px; height: 48px; background: #0a0f1e; border-radius: 50%; }
+        .circular-value { position: relative; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; font-weight: 700; color: #fff; }
+        
+        /* Continuous Spin Animation applied on hover */
+        .emp-card:hover .circular-chart { animation: pulseSpin 2s linear infinite; }
+        @keyframes pulseSpin { 0% { box-shadow: 0 0 10px var(--neon-blue); } 50% { box-shadow: 0 0 25px var(--neon-purple); transform: scale(1.05); } 100% { box-shadow: 0 0 10px var(--neon-blue); transform: scale(1); } }
+
+        /* Financials */
+        .fin-data { display: flex; justify-content: space-between; align-items: flex-end; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.02); }
+        .fin-data p { color: #8892b0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .fin-data .rate h4 { font-size: 1.4rem; color: #fff; font-family: 'Orbitron', sans-serif; }
+        .fin-data .net h4 { font-size: 2rem; color: #00ff88; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 10px rgba(0,255,136,0.3); }
+
+        /* Signature Footer */
+        footer { text-align: center; padding: 50px; margin-top: 60px; border-top: 1px solid var(--border-glass); }
+        .sig-box { display: inline-block; padding: 25px 50px; background: rgba(0,0,0,0.3); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .sig-box h3 { color: #fff; font-size: 1.2rem; font-weight: 500; letter-spacing: 1px; }
+        .sig-box p { color: var(--neon-blue); font-family: 'Orbitron', sans-serif; font-size: 1.4rem; margin-top: 10px; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 10px rgba(0,243,255,0.4); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Interactions -->
+    <div class="bg-grid"></div>
+    <div id="cursor-glow"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="glass-panel">
+            <div class="brand">
+                <h1>PR ABDELNASER</h1>
+                <p style="color: #8892b0; letter-spacing: 4px; text-transform: uppercase; font-weight: 700; margin-top: 5px;">
+                    <i class="fas fa-network-wired"></i> Global Enterprise Network
+                </p>
+            </div>
+            <div class="server-time">
+                <h3><i class="fas fa-satellite-dish"></i> Live Server Sync</h3>
+                <p id="live-date">Loading...</p>
+            </div>
+        </header>
+
+        <!-- Payroll Countdown -->
+        <div class="countdown-section glass-panel">
+            <h2><i class="fas fa-file-invoice-dollar"></i> Time Until Global Payroll Cycle (30th)</h2>
+            <div style="margin-top: 15px;">
+                <span class="days" id="days-left">00</span> <span style="font-size: 1.5rem; color: #8892b0; text-transform: uppercase;">Days Remaining</span>
+            </div>
+        </div>
+
+        <!-- Executive Board -->
+        <div class="exec-grid">
+            <div class="exec-card glass-panel">
+                <div class="exec-title">Chief Executive Officer</div>
+                <div class="exec-name">Eng. Abdel Nasser</div>
+                <p style="color: #8892b0; text-transform: uppercase; font-size: 0.9rem;">Total Executive Equity</p>
+                <div class="exec-revenue" id="ceo-rev">0 <span>EGP</span></div>
+            </div>
+            <div class="exec-card glass-panel">
+                <div class="exec-title">Chief Operating Officer</div>
+                <div class="exec-name">Ahmed Abdallah</div>
+                <p style="color: #8892b0; text-transform: uppercase; font-size: 0.9rem;">Operational Shares</p>
+                <div class="exec-revenue" id="coo-rev">0 <span>EGP</span></div>
+            </div>
+        </div>
+
+        <!-- Operations Team -->
+        <h2 class="section-title"><i class="fas fa-users-cog"></i> Core Operations Matrix</h2>
+        <div class="team-grid" id="team-matrix">
+            <!-- JS Injected Cards -->
+        </div>
+    </div>
+
+    <!-- Mandatory Signature -->
+    <footer>
+        <div class="sig-box glass-panel">
+            <h3>Developed and Created by Eng. Abdel Nasser</h3>
+            <p>Ramadan Kareem App</p>
+        </div>
+    </footer>
+
+    <script>
+        // Interactive Cursor
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('cursor-glow');
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // Time & Date System
+        const initTime = () => {
+            const dateEl = document.getElementById('live-date');
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            
+            setInterval(() => {
+                const now = new Date();
+                dateEl.innerText = now.toLocaleDateString('en-US', options).toUpperCase() + ' | ' + now.toLocaleTimeString('en-US', {hour12: false});
+            }, 1000);
+
+            const today = new Date();
+            let target = new Date(today.getFullYear(), today.getMonth(), 30);
+            if(today.getDate() > 30) target = new Date(today.getFullYear(), today.getMonth() + 1, 30);
+            
+            const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+            document.getElementById('days-left').innerText = diff.toString().padStart(2, '0');
+        };
+        initTime();
+
+        // High-Value Enterprise Data (Egyptian Names in English)
+        const matrixData = [
+            { id: 'SYS-001', name: 'Ahmed Mohamed', dept: 'Frontend Architecture', completed: 145, target: 150, rate: 850 },
+            { id: 'SYS-002', name: 'Mahmoud Sayed', dept: 'Technical Support', completed: 210, target: 250, rate: 450 },
+            { id: 'SYS-003', name: 'Mostafa Tarek', dept: 'Backend Infrastructure', completed: 88, target: 100, rate: 1200 },
+            { id: 'SYS-004', name: 'Karim Hassan', dept: 'Data Processing', completed: 450, target: 500, rate: 250 },
+            { id: 'SYS-005', name: 'Omar Khaled', dept: 'UI/UX Visuals', completed: 65, target: 80, rate: 1500 },
+            { id: 'SYS-006', name: 'Youssef Ibrahim', dept: 'Systems Analytics', completed: 42, target: 50, rate: 2100 }
+        ];
+
+        let totalCorpRevenue = 0;
+        const grid = document.getElementById('team-matrix');
+
+        const formatCurr = (num) => { return num.toLocaleString('en-US'); };
+
+        matrixData.forEach((agent, i) => {
+            const netProfit = agent.completed * agent.rate;
+            const progressPct = Math.min((agent.completed / agent.target) * 100, 100);
+            const remaining = agent.target - agent.completed;
+            
+            // Inflated corporate cut (50% goes to board)
+            totalCorpRevenue += (netProfit * 0.5);
+
+            const card = document.createElement('div');
+            card.className = 'emp-card glass-panel';
+            
+            card.innerHTML = `
+                <div class="emp-header">
+                    <div class="emp-info">
+                        <h3>${agent.name}</h3>
+                        <span class="dept-badge"><i class="fas fa-layer-group"></i> ${agent.dept}</span>
+                    </div>
+                    <div class="emp-id">${agent.id}</div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="linear-track">
+                        <div class="linear-stats">
+                            <span>Target: ${agent.target}</span>
+                            <span style="color: #fff; font-weight: bold;">Done: ${agent.completed}</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" id="bar-${i}"></div>
+                        </div>
+                        <div class="linear-stats" style="margin-top: 8px; font-size: 0.85rem; color: #ff0055;">
+                            <span>Remaining: ${remaining}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="circular-chart" id="circ-${i}">
+                        <span class="circular-value">${progressPct.toFixed(1)}%</span>
+                    </div>
+                </div>
+
+                <div class="fin-data">
+                    <div class="rate">
+                        <p>Unit Rate</p>
+                        <h4>${formatCurr(agent.rate)} EGP</h4>
+                    </div>
+                    <div class="net">
+                        <p>Net Allocation</p>
+                        <h4>${formatCurr(netProfit)}</h4>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+
+            // Animate Progress Bars on Load
+            setTimeout(() => {
+                document.getElementById(`bar-${i}`).style.width = `${progressPct}%`;
+                document.getElementById(`circ-${i}`).style.background = `conic-gradient(var(--neon-blue) ${progressPct}%, rgba(255,255,255,0.05) 0%)`;
+            }, 500 + (i * 200));
+        });
+
+        // Number Counter Animation for Execs
+        const animateCounter = (id, targetVal, duration) => {
+            const obj = document.getElementById(id);
+            let startTime = null;
+            const step = (currentTime) => {
+                if (!startTime) startTime = currentTime;
+                const progress = Math.min((currentTime - startTime) / duration, 1);
+                obj.innerHTML = formatCurr(Math.floor(progress * targetVal)) + ' <span>EGP</span>';
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        };
+
+        // CEO gets 60% of corp pool, COO gets 40% (Values are massive now)
+        setTimeout(() => {
+            animateCounter("ceo-rev", totalCorpRevenue * 0.6, 2500);
+            animateCounter("coo-rev", totalCorpRevenue * 0.4, 2500);
+        }, 800);
+
+    </script>
+</body>
+</html>
+
